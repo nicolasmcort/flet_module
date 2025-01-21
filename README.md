@@ -1,7 +1,7 @@
 # flet_module
 El siguiente código representa el módulo de flet que creé para facilitar más el uso de esta herramienta al momento de crear la GUI. Cada widget tiene una posición en la pantalla definida por la clase Widget con los atributos top y left. A algunos se les puede cambiar el alto y el ancho.
 
-En el if __name__ == "__main__", hay una pequeña demostración, aunque muy desorganizada. Con esa probaba las clases. 
+En el if __name__ == "__main__", hay una pequeña demostración, aunque muy desorganizada. La usaba para probar las clases.  
 
 Otro dato importante es que la clase PageManager me permite cambiar de página en la app. Flet tiene métodos para esto, pero debido a la estructura que ya había comenzado a crear, era mejor opción escribir un código por separado que oculte los widgets actuales y muestre los de la nueva página.
 ``` python
