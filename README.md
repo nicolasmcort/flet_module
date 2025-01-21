@@ -113,24 +113,75 @@ class Switch(Widget):
 
 # Widget Dropdown
 class Dropdown(Widget):
-    def __init__(self, options, left=0, top=0):
+    def __init__(self, options, left=0, top=0, width=200):
         super().__init__("", left, top)
-        self.options = options  # Opciones del Dropdown
-        self.selected_option = options[0] if options else None  # Opción seleccionada por defecto
+        self.options = options
+        self.selected_option = options[0] if options else None
 
         self.dropdown = ft.Dropdown(
             options=[ft.dropdown.Option(option) for option in options],
-            on_change=self.update_selected_option
+            on_change=self.update_selected_option,
+            width=width,
+            content_padding=ft.padding.symmetric(horizontal=10),  # Ajusta el padding interno
+            alignment=ft.alignment.center_left,  # Alinea el contenido a la izquierda
         )
 
     def update_selected_option(self, e):
-        """Actualiza la opción seleccionada en el Dropdown."""
         self.selected_option = e.control.value
-        #print(f"Dropdown cambiado: {self.selected_option}")  # Para verificar en la consola
 
     def create(self):
         return ft.Container(content=self.dropdown, left=self.left, top=self.top)
 
+# Widget PopupMenu
+class PopupMenu(Widget):
+    def __init__(self, options, icon="▼", left=0, top=0, text_color="white", tooltip="Show menu",
+        bg_color="gray", font_size=16, border_radius=5, width=120, height=40, page=None
+    ):
+        super().__init__("", left, top, width, height)
+        self.options = options
+        self.selected_option = options[0] if options else None
+        self.text_color = text_color
+        self.bg_color = bg_color
+        self.font_size = font_size
+        self.border_radius = border_radius
+        self.page = page
+
+        # Crear el PopupMenuButton personalizado
+        self.popup_menu = ft.PopupMenuButton(
+            icon=icon,
+            tooltip=tooltip,
+            content=ft.Container(
+                bgcolor=self.bg_color,
+                border_radius=self.border_radius,
+                padding=10,
+                content=ft.Text(
+                    value=icon,  
+                    size=self.font_size,
+                    color=self.text_color,
+                ),
+            ),
+            items=[
+                ft.PopupMenuItem(text=option, on_click=self.update_selected_option)
+                for option in options
+            ],
+        )
+
+
+
+    def update_selected_option(self, e):
+        """Actualiza la opción seleccionada en el PopupMenu."""
+        self.selected_option = e.control.text
+        #print(f"Opción seleccionada: {self.selected_option}")
+
+    def create(self):
+        """Crea y retorna el contenedor del PopupMenu."""
+        return ft.Container(
+            content=self.popup_menu,
+            left=self.left,
+            top=self.top,
+            width=self.width,
+            height=self.height,
+        )
 
 # Widget RadioGroup
 class RadioGroup(Widget):
@@ -178,6 +229,38 @@ class CheckBox(Widget):
     def create(self):
         return ft.Container(content=self.checkbox, left=self.left, top=self.top)
 
+
+# Widget CheckBoxGroup
+class CheckBoxGroup(Widget):
+    def __init__(self, options, left=0, top=0):
+        super().__init__("", left, top)
+        self.options = options  # Opciones del CheckBoxGroup
+        self.selected_options = []  # Lista de opciones seleccionadas
+
+        # Crear los CheckBox individuales
+        self.checkboxes = [
+            ft.Checkbox(
+                label=option,
+                value=False,
+                on_change=self.update_selected_options
+            ) for option in options
+        ]
+
+    def update_selected_options(self, e):
+        """Actualiza la lista de opciones seleccionadas."""
+        self.selected_options = [
+            checkbox.label for checkbox in self.checkboxes if checkbox.value
+        ]
+        # print(f"Opciones seleccionadas: {self.selected_options}")
+
+    def create(self):
+        """Crea y retorna el contenedor del CheckBoxGroup."""
+        return ft.Container(
+            content=ft.Column(controls=self.checkboxes),
+            left=self.left,
+            top=self.top,
+        )
+
 # Widget Slider
 class Slider(Widget):
     def __init__(self, min_value=0, max_value=100, left=0, top=0):
@@ -188,17 +271,6 @@ class Slider(Widget):
         return ft.Container(content=self.slider, left=self.left, top=self.top)
 
 # Widget TextArea
-""" class TextArea(Widget):
-    def __init__(self, left=0, top=0, hint_area="Text Area", on_change=None):
-        super().__init__("", left, top)
-        self.on_change = on_change
-        # Crear el TextField como un área de texto con multiline=True
-        self.text_area = ft.TextField(multiline=True, label=hint_area, height=100, on_change=self.on_change)
-
-    def create(self):
-        return ft.Container(content=self.text_area, left=self.left, top=self.top)
- """
-
 class TextArea(Widget):
     def __init__(self, left=0, top=0, hint_area="Text Area", on_change=None):
         super().__init__("", left, top)
@@ -250,15 +322,34 @@ class ProgressBar(Widget):
 
 # Widget Button
 class Button(Widget):
-    def __init__(self, label, action, left=0, top=0):
+    def __init__(self, label, action=None, left=0, top=0, 
+                 bg_color=ft.Colors.GREY_900, text_color=ft.Colors.BLUE_200, 
+                 width=90, height=60, border_radius=8, font_size=16):
         super().__init__("", left, top)
-        self.button = ft.ElevatedButton(text=label, on_click=action)
+
+        # Crear el botón con las propiedades personalizadas
+        self.button = ft.ElevatedButton(
+            text=label,
+            on_click=action,
+            bgcolor=bg_color,  # Color de fondo
+            color=text_color,  # Color del texto
+            width=width,       # Ancho del botón
+            height=height,     # Alto del botón
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=border_radius),
+                text_style=ft.TextStyle(size=font_size)
+            )
+        )
 
     def create(self):
-        return ft.Container(content=self.button, left=self.left, top=self.top)
+        return ft.Container(
+            content=self.button,
+            left=self.left,
+            top=self.top
+        )
 
 # Class to select files
-class FileSelector: 
+class FileSelector: #*******************************************************************************************************************************************Falta
     def __init__(self, page: ft.Page):
         self.page = page
         self.selected_file = None  # Almacena la ruta del archivo seleccionado
@@ -310,7 +401,12 @@ if __name__ == "__main__":
         
         button_select = Button(label="Select file", action=file_selector.select_file, left=50, top=20)
 
-
+        menu = PopupMenu(options=["Option 1", "Option 2", "Option 3"], bg_color="blue", left=0, top=0, page=page, width=180, text_color="white")
+        checkbox_group = CheckBoxGroup(
+            options=["Opción 1", "Opción 2", "Opción 3"],
+            left=10,
+            top=10
+        )
         # Función para añadir 'x' a ambos textos
         def add_x():
             text1.update(text=text1.text.value + "x")
@@ -323,8 +419,8 @@ if __name__ == "__main__":
             text2.update(bg_color="white")
             page.update()
 
-        page1_widgets = [text1, radio_group, checkbox, slider, text_area, rectangle, button_add_x, button_p1]
-        page2_widgets = [text2, switch, table, dropdown, circle, progress_bar, button_change_color, button_p2]
+        page1_widgets = [menu, text1, radio_group, checkbox, slider, text_area, rectangle, button_add_x, button_p1]
+        page2_widgets = [text2, switch, table, dropdown, circle, progress_bar, button_change_color, button_p2, checkbox_group]
 
 
         # Agregar páginas al PageManager
@@ -337,5 +433,4 @@ if __name__ == "__main__":
 
 
     ft.app(target=main)
-
 ```
